@@ -23,8 +23,6 @@
     --pro:#1a0e9a;         /* AirTrack electric blue — used for Pro tier + emphasis */
     --pro-soft:#dfecf9;
     --amber:#f59f00;
-    --placeholder-bg:#fff1e3;
-    --placeholder-line:#ff610a;
     --shadow:0 12px 34px rgba(11,18,32,.10);
     --shadow-lg:0 22px 60px rgba(11,18,32,.16);
     --radius:18px;
@@ -46,15 +44,6 @@
   .eyebrow{font-size:.8rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
   .lede{font-size:clamp(1.05rem,2.4vw,1.28rem);color:var(--ink-soft);max-width:640px}
 
-  /* Placeholder callouts — remove once real assets are dropped in */
-  .placeholder{
-    border:2px dashed var(--placeholder-line);background:var(--placeholder-bg);border-radius:12px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-    color:var(--orange-dark);text-align:center;font-weight:700
-  }
-  .placeholder .ph-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
-  .placeholder .ph-sub{font-size:.7rem;font-weight:600;color:var(--ink-soft)}
-
   /* Buttons */
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
     font-weight:800;font-size:1.02rem;padding:15px 28px;border-radius:999px;cursor:pointer;
@@ -75,9 +64,8 @@
     backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
   .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
   .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.15rem;letter-spacing:-.02em}
-  .brand .logo-slot{width:34px;height:34px}
-  .brand .logo-slot.placeholder{font-size:0}
-  .brand .logo-slot.placeholder .ph-label{font-size:.5rem;line-height:1}
+  .brand-logo{height:24px;width:auto}
+  .brand-logo-footer{height:20px}
   .nav-cta{display:flex;align-items:center;gap:14px}
   .nav .link{font-weight:700;font-size:.95rem;color:var(--ink-soft)}
   @media(max-width:640px){.nav .link{display:none}}
@@ -128,10 +116,6 @@
   .vcard.b p{color:#c8d0ea}
   .vcard .big{font-size:2.2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
   .vcard.b .big{color:#fff}
-
-  /* Product screenshot placeholder */
-  .shot-placeholder{aspect-ratio:9/16;max-width:220px;margin:0 auto}
-  .shot-placeholder .ph-label{font-size:.68rem}
 
   /* Pricing */
   .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
@@ -210,11 +194,7 @@
 <header class="site">
   <div class="wrap nav">
     <div class="brand">
-      <!-- PLACEHOLDER: swap for the real AirTrack logo mark (SVG/PNG, ~34x34px) -->
-      <span class="logo-slot placeholder" style="width:34px;height:34px;border-radius:8px">
-        <span class="ph-label">LOGO</span>
-      </span>
-      AirTrack
+      <img src="assets/airtrack-logo.svg" alt="AirTrack" class="brand-logo">
     </div>
     <div class="nav-cta">
       <a class="link" href="#how">How it works</a>
@@ -299,11 +279,7 @@
 <section>
   <div class="wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center">
     <div>
-      <!-- PLACEHOLDER: swap for a real product screenshot (e.g. the AirTrack activity screen or exposure map) -->
-      <div class="placeholder shot-placeholder">
-        <span class="ph-label">App screenshot</span>
-        <span class="ph-sub">1080×1920 PNG recommended</span>
-      </div>
+      <img class="feed-screenshot" src="assets/newdashboard.png" alt="AirTrack exposure map and route detail">
     </div>
     <div>
       <span class="eyebrow">See it in the app, not just the feed</span>
@@ -486,11 +462,8 @@
   <div class="wrap">
     <div class="foot">
       <div class="brand" style="color:#fff">
-        <!-- PLACEHOLDER: swap for the real AirTrack logo mark (light/white version for dark background) -->
-        <span class="logo-slot placeholder" style="width:26px;height:26px;border-radius:8px">
-          <span class="ph-label" style="font-size:.42rem">LOGO</span>
-        </span>
-        AirTrack <span style="color:#7f8ba0;font-weight:600;font-size:.85rem">by Air Aware Labs</span>
+        <img src="assets/airtrack-logo.svg" alt="AirTrack" class="brand-logo brand-logo-footer">
+        <span style="color:#7f8ba0;font-weight:600;font-size:.85rem">by Air Aware Labs</span>
       </div>
       <div style="display:flex;gap:18px;flex-wrap:wrap">
         <a href="https://www.airawarelabs.com/airtrack">AirTrack</a>

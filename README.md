@@ -10,18 +10,21 @@ Styling (colors, fonts, spacing tokens) was pulled from the live brand site at
 - Clean-air green: `#5b8e3e`
 - Body copy gray: `#4a5e72`
 
-## Placeholders to replace
+## Assets
 
-Marked with dashed orange boxes / HTML comments in `index.html`. Search for `PLACEHOLDER`:
+All placeholders have been replaced with real assets:
 
-| Location | What's needed |
+| Location | Asset |
 |---|---|
-| Header (`.brand .logo-slot`) | AirTrack logo mark, ~34×34px SVG/PNG |
-| Footer (`.brand .logo-slot`) | Light/white version of the logo for the dark footer background |
-| "See it in the app" section (`.shot-placeholder`) | Real product screenshot, 1080×1920 recommended |
+| Header logo | `assets/airtrack-logo.svg` |
+| Footer logo | `assets/airtrack-logo.svg` (same orange mark, reads fine on the dark footer) |
+| Hero (Strava feed) | `assets/Stravafeedsceenshot.png` |
+| "See it in the app" section | `assets/newdashboard.png` |
+| App Store / Google Play badges | `assets/app-store-badge.svg`, `assets/play-store-badge.png` |
 
-Everything else (App Store / Google Play badges, the Strava-compatible mention) already
-uses locally-hosted official badge assets in `/assets`.
+The footer currently reuses the same orange logo mark rather than a dedicated
+white/light variant — swap in a light version in `assets/` and update the
+`.brand-logo-footer` reference in `index.html` if one becomes available.
 
 ## Run locally
 
