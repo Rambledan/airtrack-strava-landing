@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirTrack for Strava — See what you breathe on every run</title>
+<meta name="description" content="You saw the air quality on a friend's activity. Here's how to get it on your own runs, rides and walks — free to start, straight from Strava.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Brand tokens pulled from airawarelabs.com/airtrack (live Webflow CSS, checked 2026-07-06) */
+  :root{
+    --ink:#0b1220;
+    --ink-soft:#4a5e72;
+    --paper:#ffffff;
+    --mist:#f1f7f9;
+    --line:#dbe6f0;
+    --orange:#ff610a;      /* AirTrack CTA orange */
+    --orange-dark:#e85800;
+    --strava:#fc4c02;
+    --clean:#5b8e3e;       /* AirTrack clean-air green */
+    --pro:#1a0e9a;         /* AirTrack electric blue — used for Pro tier + emphasis */
+    --pro-soft:#dfecf9;
+    --amber:#f59f00;
+    --placeholder-bg:#fff1e3;
+    --placeholder-line:#ff610a;
+    --shadow:0 12px 34px rgba(11,18,32,.10);
+    --shadow-lg:0 22px 60px rgba(11,18,32,.16);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{width:100%;max-width:1080px;margin:0 auto;padding:0 20px}
+  .center{text-align:center}
+  h1,h2,h3{line-height:1.12;letter-spacing:-.02em;font-weight:800}
+  h1{font-size:clamp(2rem,6vw,3.4rem)}
+  h2{font-size:clamp(1.6rem,4.2vw,2.5rem)}
+  h3{font-size:1.18rem}
+  .eyebrow{font-size:.8rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+  .lede{font-size:clamp(1.05rem,2.4vw,1.28rem);color:var(--ink-soft);max-width:640px}
+
+  /* Placeholder callouts — remove once real assets are dropped in */
+  .placeholder{
+    border:2px dashed var(--placeholder-line);background:var(--placeholder-bg);border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    color:var(--orange-dark);text-align:center;font-weight:700
+  }
+  .placeholder .ph-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+  .placeholder .ph-sub{font-size:.7rem;font-weight:600;color:var(--ink-soft)}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    font-weight:800;font-size:1.02rem;padding:15px 28px;border-radius:999px;cursor:pointer;
+    border:2px solid transparent;transition:transform .15s ease,box-shadow .15s ease;white-space:nowrap}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:var(--orange);color:#fff;box-shadow:0 10px 26px rgba(255,97,10,.38)}
+  .btn-primary:hover{box-shadow:0 16px 34px rgba(255,97,10,.5)}
+  .btn-pro{background:var(--pro);color:#fff;box-shadow:0 10px 26px rgba(26,14,154,.36)}
+  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn-sm{padding:11px 20px;font-size:.92rem}
+  .store-badges{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .store-badges img{height:50px;width:auto}
+  .reassure{font-size:.9rem;color:var(--ink-soft);margin-top:12px}
+  .reassure b{color:var(--ink)}
+
+  /* Header */
+  header.site{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.15rem;letter-spacing:-.02em}
+  .brand .logo-slot{width:34px;height:34px}
+  .brand .logo-slot.placeholder{font-size:0}
+  .brand .logo-slot.placeholder .ph-label{font-size:.5rem;line-height:1}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .nav .link{font-weight:700;font-size:.95rem;color:var(--ink-soft)}
+  @media(max-width:640px){.nav .link{display:none}}
+
+  /* Hero */
+  .hero{background:
+      radial-gradient(1200px 500px at 80% -10%,rgba(26,14,154,.10),transparent),
+      radial-gradient(900px 500px at 0% 0%,rgba(255,97,10,.10),transparent),
+      linear-gradient(180deg,#fff, var(--mist));
+    padding:52px 0 60px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:34px}}
+  .hero h1{margin:14px 0 16px}
+  .hero .lede{margin-bottom:26px}
+  .hero-cta{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+  .trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--ink-soft);font-size:.9rem;font-weight:600}
+  .trust b{color:var(--ink)}
+
+  /* Strava replica card */
+  .feed-card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lg);
+    overflow:hidden;max-width:400px;margin:0 auto;width:100%}
+  .fc-top{display:flex;align-items:center;gap:12px;padding:16px 18px 10px}
+  .fc-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff8f5e,#ff610a);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.05rem}
+  .fc-name{font-weight:800;font-size:.98rem}
+  .fc-sub{font-size:.8rem;color:var(--ink-soft)}
+  .fc-title{padding:2px 18px 10px;font-weight:800;font-size:1.12rem}
+  .fc-stats{display:flex;gap:26px;padding:4px 18px 14px;border-bottom:1px solid var(--line)}
+  .fc-stat .k{font-size:.72rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .fc-stat .v{font-size:1.24rem;font-weight:800}
+  .fc-map{height:120px;background:
+     linear-gradient(120deg,#eaf2ec,#e5eef7);position:relative;overflow:hidden}
+  .fc-map svg{position:absolute;inset:0;width:100%;height:100%}
+  .fc-aq{background:linear-gradient(180deg,#fff,#f6fbf8);padding:14px 18px;border-top:1px solid var(--line)}
+  .fc-aq .row1{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.86rem;color:var(--clean)}
+  .fc-aq .tag{margin-left:auto;background:var(--clean);color:#fff;font-size:.72rem;font-weight:800;
+    padding:3px 9px;border-radius:999px}
+  .fc-aq .line{font-size:.9rem;color:var(--ink-soft);margin-top:6px}
+  .fc-aq .line b{color:var(--ink)}
+  .fc-brand{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--ink-soft);
+    padding:10px 18px;border-top:1px solid var(--line)}
+  .fc-brand .chip{width:16px;height:16px;border-radius:5px;background:var(--orange)}
+  .pulse{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--strava);
+    box-shadow:0 0 0 rgba(252,76,2,.5);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(252,76,2,.5)}70%{box-shadow:0 0 0 12px rgba(252,76,2,0)}100%{box-shadow:0 0 0 0 rgba(252,76,2,0)}}
+
+  /* Sections */
+  section{padding:66px 0}
+  .section-mist{background:var(--mist)}
+  .section-head{max-width:680px;margin:0 auto 44px}
+  .section-head.left{margin-left:0}
+  .section-head h2{margin:10px 0 12px}
+  .section-head p{color:var(--ink-soft);font-size:1.08rem}
+
+  /* Steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:800px){.steps{grid-template-columns:1fr}}
+  .step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;box-shadow:var(--shadow)}
+  .step .num{width:38px;height:38px;border-radius:11px;background:var(--orange);color:#fff;font-weight:800;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:1.05rem}
+  .step h3{margin-bottom:8px}
+  .step p{color:var(--ink-soft);font-size:.98rem}
+
+  /* Split value */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  @media(max-width:800px){.split{grid-template-columns:1fr}}
+  .vcard{border-radius:var(--radius);padding:30px 28px;border:1px solid var(--line)}
+  .vcard.a{background:#fff}
+  .vcard.b{background:linear-gradient(160deg,#0b1220,#1a0e9a);color:#fff;border-color:transparent}
+  .vcard h3{font-size:1.25rem;margin-bottom:10px}
+  .vcard.b h3{color:#fff}
+  .vcard p{color:var(--ink-soft)}
+  .vcard.b p{color:#c8d0ea}
+  .vcard .big{font-size:2.2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+  .vcard.b .big{color:#fff}
+
+  /* Product screenshot placeholder */
+  .shot-placeholder{aspect-ratio:9/16;max-width:220px;margin:0 auto}
+  .shot-placeholder .ph-label{font-size:.68rem}
+
+  /* Pricing */
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+  @media(max-width:860px){.tiers{grid-template-columns:1fr;max-width:440px;margin:0 auto}}
+  .tier{background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px 26px;
+    display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative}
+  .tier.pro{border:2px solid var(--pro);box-shadow:0 22px 54px rgba(26,14,154,.18)}
+  .tier .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+    background:var(--pro);color:#fff;font-size:.74rem;font-weight:800;letter-spacing:.06em;
+    padding:6px 16px;border-radius:999px;text-transform:uppercase;white-space:nowrap}
+  .tier .tname{font-weight:800;font-size:1.15rem}
+  .tier .twho{font-size:.86rem;color:var(--ink-soft);margin-top:2px;min-height:38px}
+  .tier .price{font-size:2.4rem;font-weight:800;letter-spacing:-.03em;margin:14px 0 2px}
+  .tier .price small{font-size:.95rem;font-weight:700;color:var(--ink-soft)}
+  .tier .yr{font-size:.84rem;color:var(--ink-soft);margin-bottom:16px;min-height:20px}
+  .tier ul{list-style:none;margin:6px 0 22px;display:flex;flex-direction:column;gap:11px}
+  .tier li{display:flex;gap:10px;font-size:.94rem;color:var(--ink-soft)}
+  .tier li .tick{color:var(--clean);font-weight:900;flex:none}
+  .tier.pro li .tick{color:var(--pro)}
+  .tier li b{color:var(--ink);font-weight:700}
+  .tier .cta{margin-top:auto}
+  .tier .cta .btn{width:100%}
+
+  /* Performance science */
+  .perf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media(max-width:760px){.perf-grid{grid-template-columns:1fr}}
+  .perf{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;box-shadow:var(--shadow)}
+  .perf .ico{width:44px;height:44px;border-radius:12px;background:var(--pro-soft);color:var(--pro);
+    display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin-bottom:14px}
+  .perf h3{font-size:1.1rem;margin-bottom:8px}
+  .perf p{color:var(--ink-soft);font-size:.96rem}
+  .perf .stat{display:inline-block;background:var(--pro-soft);color:var(--pro);font-weight:800;
+    font-size:.84rem;padding:4px 11px;border-radius:999px;margin-bottom:12px}
+  .perf-note{font-size:.82rem;color:var(--ink-soft);max-width:760px;margin:26px auto 0;text-align:center}
+
+  /* Onboarding */
+  .ob{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:760px){.ob{grid-template-columns:1fr}}
+  .obstep{display:flex;gap:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
+  .obstep .n{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;
+    display:flex;align-items:center;justify-content:center;flex:none}
+  .obstep h3{font-size:1.05rem;margin-bottom:5px}
+  .obstep p{font-size:.94rem;color:var(--ink-soft)}
+  .perm{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;margin-top:26px}
+  .perm h3{font-size:1.05rem;margin-bottom:12px;display:flex;gap:8px;align-items:center}
+  .perm ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .perm li{display:flex;gap:10px;font-size:.93rem;color:var(--ink-soft)}
+  .perm li .k{color:var(--strava);font-weight:900;flex:none}
+  .perm li b{color:var(--ink)}
+
+  /* Final CTA */
+  .final{background:linear-gradient(160deg,#0b1220,#1a0e9a);color:#fff;text-align:center;border-radius:26px;
+    padding:56px 28px;box-shadow:var(--shadow-lg)}
+  .final h2{color:#fff;margin-bottom:12px}
+  .final p{color:#c8d0ea;max-width:560px;margin:0 auto 26px;font-size:1.08rem}
+  .final .store-badges{justify-content:center}
+  .final .reassure{color:#9fb0cc}
+
+  /* FAQ */
+  details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 20px;margin-bottom:12px}
+  summary{cursor:pointer;font-weight:700;padding:16px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:1.4rem;color:var(--orange);font-weight:700}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--ink-soft);padding:0 0 16px;font-size:.96rem}
+
+  footer{background:var(--ink);color:#aab8ce;padding:34px 0;font-size:.86rem}
+  .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+  .foot a{color:#cdd8ea;font-weight:600}
+  .disclaim{font-size:.78rem;color:#7f8ba0;margin-top:14px;max-width:820px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand">
+      <!-- PLACEHOLDER: swap for the real AirTrack logo mark (SVG/PNG, ~34x34px) -->
+      <span class="logo-slot placeholder" style="width:34px;height:34px;border-radius:8px">
+        <span class="ph-label">LOGO</span>
+      </span>
+      AirTrack
+    </div>
+    <div class="nav-cta">
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#pricing">Pricing</a>
+      <a class="btn btn-primary btn-sm" href="https://lprdg.app.link/Xsh8RXXjVXb">Get the app</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">You just saw this on a friend's feed</span>
+      <h1>The air they breathed on that run? Now see yours.</h1>
+      <p class="lede">You clicked because a friend's Strava activity showed their air quality. AirTrack adds that same layer to <b>your</b> runs, rides and walks — the pollution you actually breathed, mapped to every kilometre. Free to start. No new hardware.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://lprdg.app.link/Xsh8RXXjVXb">Get AirTrack free →</a>
+        <p class="reassure"><b>Free forever</b> to start · Connects to your existing Strava · Set up in about 2 minutes</p>
+      </div>
+      <div class="trust">
+        <span><b>4,500+</b> movers</span>
+        <span><b>400,000+</b> activities tracked</span>
+        <span><b>80+</b> countries</span>
+      </div>
+    </div>
+
+    <!-- Replica Strava card -->
+    <div>
+      <div class="feed-card">
+        <div class="fc-top">
+          <div class="fc-av">JR</div>
+          <div>
+            <div class="fc-name">Jamie R.</div>
+            <div class="fc-sub">Morning Run · Today at 07:12</div>
+          </div>
+        </div>
+        <div class="fc-title">Parkrun 5K 🏃‍♀️</div>
+        <div class="fc-stats">
+          <div class="fc-stat"><div class="k">Distance</div><div class="v">5.02<span style="font-size:.8rem"> km</span></div></div>
+          <div class="fc-stat"><div class="k">Pace</div><div class="v">4:48<span style="font-size:.8rem"> /km</span></div></div>
+          <div class="fc-stat"><div class="k">Time</div><div class="v">24:06</div></div>
+        </div>
+        <div class="fc-map">
+          <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+            <path d="M20,95 C70,40 120,120 170,70 S280,30 330,60 380,40 390,55" fill="none" stroke="#fc4c02" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <div class="pulse" style="left:18px;top:88px"></div>
+        </div>
+        <div class="fc-aq">
+          <div class="row1">🌬️ Air quality on this route <span class="tag">CLEAN</span></div>
+          <div class="line">Avg exposure <b>PM2.5 6 µg/m³</b> · You picked a low-traffic route — nice one. <b>Exposure 22% below</b> your weekly average.</div>
+        </div>
+        <div class="fc-brand"><span class="chip"></span> Air quality by AirTrack · compatible with Strava</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY YOU'RE HERE -->
+<section>
+  <div class="wrap section-head center">
+    <span class="eyebrow">Strava tells half the story</span>
+    <h2>You track how far and how fast. AirTrack tracks what you breathed.</h2>
+    <p>Every outdoor session is a lungful of the city around you — and it's invisible. AirTrack turns it into a number you can act on, right inside the feed you already use.</p>
+  </div>
+  <div class="wrap split">
+    <div class="vcard a">
+      <div class="big">5.02 km · 4:48/km</div>
+      <h3>What Strava shows you</h3>
+      <p>Distance, pace, heart rate, segments. Everything about the effort you put in — but nothing about the air that effort pulled into your lungs.</p>
+    </div>
+    <div class="vcard b">
+      <div class="big">PM2.5 · NO₂ · route exposure</div>
+      <h3>What AirTrack adds</h3>
+      <p>The pollution you actually breathed, kilometre by kilometre, written straight into your Strava activity. Proof that your quieter route was the cleaner one — and a prompt when it wasn't.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-mist" id="how">
+  <div class="wrap section-head center">
+    <span class="eyebrow">How the Strava integration works</span>
+    <h2>Three steps. No new device. No new habit.</h2>
+    <p>You keep recording with Strava exactly as you do now. AirTrack quietly does the rest and adds the air quality line to your activity.</p>
+  </div>
+  <div class="wrap steps">
+    <div class="step">
+      <div class="num">1</div>
+      <h3>Download &amp; connect Strava</h3>
+      <p>Get the free app, create an account, and tap "Connect Strava." You approve the permissions once — that's it.</p>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <h3>Record like you always do</h3>
+      <p>Run, ride or walk and hit save in Strava. AirTrack automatically reads where and when you moved to work out your exposure.</p>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <h3>See your air in the feed</h3>
+      <p>Your air quality appears in the activity description — the same clean-air line your friends can see and tap, just like you did.</p>
+    </div>
+  </div>
+</section>
+
+<!-- APP PREVIEW -->
+<section>
+  <div class="wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center">
+    <div>
+      <!-- PLACEHOLDER: swap for a real product screenshot (e.g. the AirTrack activity screen or exposure map) -->
+      <div class="placeholder shot-placeholder">
+        <span class="ph-label">App screenshot</span>
+        <span class="ph-sub">1080×1920 PNG recommended</span>
+      </div>
+    </div>
+    <div>
+      <span class="eyebrow">See it in the app, not just the feed</span>
+      <h2>Every route, mapped by what you breathed.</h2>
+      <p class="lede">Open AirTrack to see the same exposure data plotted against your route, with cleaner-air suggestions for next time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap section-head center">
+    <span class="eyebrow">Choose your plan</span>
+    <h2>Start free. Upgrade when you want the full picture.</h2>
+    <p>Every plan writes air quality into your Strava feed. The difference is how often — and how deep you want to go.</p>
+  </div>
+  <div class="wrap tiers">
+
+    <!-- FREE -->
+    <div class="tier">
+      <div class="tname">Free</div>
+      <div class="twho">For getting a taste of your exposure in Strava.</div>
+      <div class="price">£0</div>
+      <div class="yr">Free forever</div>
+      <ul>
+        <li><span class="tick">✓</span> Air quality on <b>every 3rd activity</b> you record</li>
+        <li><span class="tick">✓</span> Live air quality &amp; same-day forecast</li>
+        <li><span class="tick">✓</span> Strava, Apple Health &amp; Google Health sync</li>
+        <li><span class="tick">✓</span> Join leaderboards &amp; share activities</li>
+      </ul>
+      <div class="cta"><a class="btn btn-ghost" href="https://lprdg.app.link/Xsh8RXXjVXb">Start free</a></div>
+    </div>
+
+    <!-- PLUS -->
+    <div class="tier">
+      <div class="tname">Plus</div>
+      <div class="twho">For runners &amp; riders who want air on <b>every</b> activity.</div>
+      <div class="price">99p<small> /month</small></div>
+      <div class="yr">Cancel anytime</div>
+      <ul>
+        <li><span class="tick">✓</span> Everything in Free, plus…</li>
+        <li><span class="tick">✓</span> <b>Unlimited</b> air quality on <b>every activity</b> you record</li>
+        <li><span class="tick">✓</span> Full pollutant detail per route (PM2.5, NO₂)</li>
+        <li><span class="tick">✓</span> Choose how your air data appears in Strava</li>
+      </ul>
+      <div class="cta"><a class="btn btn-primary" href="https://lprdg.app.link/Xsh8RXXjVXb">Go Plus — 99p</a></div>
+    </div>
+
+    <!-- PRO -->
+    <div class="tier pro">
+      <div class="badge">Best for performance</div>
+      <div class="tname">Pro</div>
+      <div class="twho">For athletes who train around their air — not just record it.</div>
+      <div class="price">£6.99<small> /month</small></div>
+      <div class="yr">or £49.99/year · 7-day free trial</div>
+      <ul>
+        <li><span class="tick">✓</span> Everything in Plus, plus…</li>
+        <li><span class="tick">✓</span> <b>24/7 exposure tracking</b> — no need to record everything in Strava</li>
+        <li><span class="tick">✓</span> <b>Training-effectiveness</b> &amp; race-day readiness insights</li>
+        <li><span class="tick">✓</span> Cleaner-route &amp; best-time-to-go suggestions</li>
+        <li><span class="tick">✓</span> Cognitive, respiratory &amp; wellbeing exposure signals</li>
+        <li><span class="tick">✓</span> Personal AirCoach + 4-day air &amp; pollen forecasts</li>
+      </ul>
+      <div class="cta"><a class="btn btn-pro" href="https://lprdg.app.link/Xsh8RXXjVXb">Start 7-day free trial</a></div>
+    </div>
+  </div>
+  <p class="reassure center" style="margin-top:22px">Prices include VAT. Manage or cancel anytime in the app. Payments handled securely through the App Store.</p>
+</section>
+
+<!-- PERFORMANCE SCIENCE (PRO) -->
+<section class="section-mist">
+  <div class="wrap section-head center">
+    <span class="eyebrow">Why Pro, if you care about performance</span>
+    <h2>The air you train in shapes the results you get.</h2>
+    <p>You optimise sleep, fuel and mileage. Air is the input almost nobody measures — yet the research links even small changes in exposure to real differences in how you perform, recover and feel. Pro turns that into signals you can act on.</p>
+  </div>
+  <div class="wrap perf-grid">
+    <div class="perf">
+      <div class="ico">🏁</div>
+      <div class="stat">~16s slower over a marathon per +10% above the WHO limit</div>
+      <h3>Race potential</h3>
+      <p>Studies of marathon fields link higher particulate exposure to measurably slower finish times (around 16s for men, 12s for women per +10% above the WHO PM2.5 guideline). Pro flags the cleaner windows so race and key sessions land on your best air.</p>
+    </div>
+    <div class="perf">
+      <div class="ico">📈</div>
+      <div class="stat">Cleaner air = more from the same effort</div>
+      <h3>Training effectiveness</h3>
+      <p>When you train hard you breathe harder — pulling more of whatever's around you deep into your lungs. Pro tracks the exposure behind each session so you can see whether a flat day was your legs, or your air, and schedule quality work accordingly.</p>
+    </div>
+    <div class="perf">
+      <div class="ico">🧠</div>
+      <div class="stat">Emerging cognitive links</div>
+      <h3>Brain &amp; focus</h3>
+      <p>A growing body of research associates higher long-term air pollution exposure with reduced cognitive performance and sharper focus costs. The evidence is still developing, so Pro shows your exposure trend rather than a false precise number — awareness you can factor in.</p>
+    </div>
+    <div class="perf">
+      <div class="ico">🌱</div>
+      <div class="stat">+11% new mental-health risk in more-polluted areas</div>
+      <h3>Mood &amp; wellbeing</h3>
+      <p>People who moved to a more particle-polluted area showed around an 11% higher risk of a new mental-health problem than other movers. Pro helps you keep your cumulative exposure — and its knock-on effect on how you feel — trending the right way.</p>
+    </div>
+    <div class="perf">
+      <div class="ico">🫁</div>
+      <div class="stat">Respiratory risk rises with exposure — and falls when it drops</div>
+      <h3>Respiratory health</h3>
+      <p>Higher particulate and NO₂ exposure is linked to increased asthma and COPD risk — but it cuts both ways: one Clean Air Zone cut GP visits for respiratory illness by 25% in a year. Pro's cleaner-route and timing tools help you take the lower-exposure option by default.</p>
+    </div>
+    <div class="perf">
+      <div class="ico">🧭</div>
+      <div class="stat">24/7 — not just when you press record</div>
+      <h3>Your full daily dose</h3>
+      <p>Races are won on the other 23 hours too. Pro tracks exposure across your commute, work and home — automatically — so the picture reflects everything you breathe, not only your logged sessions.</p>
+    </div>
+  </div>
+  <p class="perf-note">A note on the science: these figures come from peer-reviewed research and are straight-line estimates — a compass, not a clinical forecast. There is no known "safe" threshold for fine particulates, and the honest gain works both ways: lowering your exposure is associated with lower risk. AirTrack exists to empower better choices, never to alarm you.</p>
+</section>
+
+<!-- ONBOARDING -->
+<section id="setup">
+  <div class="wrap section-head center">
+    <span class="eyebrow">Getting started &amp; getting the most from it</span>
+    <h2>From this page to air-in-your-feed in about 2 minutes</h2>
+    <p>Here's exactly what happens after you tap download — and how to make sure your air quality shows up on every activity.</p>
+  </div>
+  <div class="wrap ob">
+    <div class="obstep"><div class="n">1</div><div><h3>Download AirTrack</h3><p>Tap the button to open the App Store, then install AirTrack. It's free and works on iPhone and Android.</p></div></div>
+    <div class="obstep"><div class="n">2</div><div><h3>Create your free account</h3><p>Open the app and sign up with email or Apple/Google. Takes under a minute — no card needed for Free.</p></div></div>
+    <div class="obstep"><div class="n">3</div><div><h3>Connect Strava</h3><p>Go to Settings → Connect Strava, sign in, and approve the permissions (see below). This is what lets AirTrack write air quality into your activities.</p></div></div>
+    <div class="obstep"><div class="n">4</div><div><h3>Record an activity</h3><p>Head out and record a run, ride or walk in Strava as normal, then save it. No need to open AirTrack while you move.</p></div></div>
+    <div class="obstep"><div class="n">5</div><div><h3>See your air in the feed</h3><p>Within a few minutes of saving, AirTrack adds your air quality to the activity description — visible to you and your followers.</p></div></div>
+    <div class="obstep"><div class="n">6</div><div><h3>Want it on every activity?</h3><p>Free covers every 3rd activity. Upgrade to Plus (99p) for unlimited, or Pro for 24/7 tracking and performance insights — all in the app.</p></div></div>
+  </div>
+
+  <div class="wrap">
+    <div class="perm">
+      <h3>🔒 What the Strava permissions mean</h3>
+      <ul>
+        <li><span class="k">•</span><span><b>View your public profile</b> — required to connect AirTrack to your Strava account.</span></li>
+        <li><span class="k">•</span><span><b>View your activities</b> — so AirTrack knows where and when you moved, to calculate your air quality.</span></li>
+        <li><span class="k">•</span><span><b>View private activities</b> — optional. Tick it if you want air quality on private activities too; untick to keep those out.</span></li>
+        <li><span class="k">•</span><span><b>Upload to Strava</b> — lets AirTrack add the air-quality line to your activity description. You can add your own text too; we simply append to it.</span></li>
+      </ul>
+      <p class="reassure" style="margin-top:14px">You're always in control — disconnect anytime in the app or in your Strava settings. AirTrack never posts anything except the air quality line you asked for.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-mist">
+  <div class="wrap" style="max-width:760px">
+    <div class="section-head center" style="margin-bottom:32px">
+      <span class="eyebrow">Quick answers</span>
+      <h2>Before you download</h2>
+    </div>
+    <details open><summary>Do I need new hardware or a wearable?</summary><p>No. AirTrack uses your phone's location and high-resolution air quality data — there's nothing to buy or wear. It works alongside the Strava you already use.</p></details>
+    <details><summary>Do I have to use Strava?</summary><p>No, but it's the easiest way. Free and Plus add air quality to your Strava activities. If you'd rather not use Strava, you can log activities in the app directly, and Pro tracks your day automatically in the background.</p></details>
+    <details><summary>What's the difference between Free, Plus and Pro?</summary><p>Free adds air quality to every 3rd activity. Plus (99p/month) adds it to every activity, unlimited. Pro (£6.99/month) adds 24/7 exposure tracking without recording everything, plus performance, cleaner-route and wellbeing insights.</p></details>
+    <details><summary>Will it drain my battery?</summary><p>Free and Plus rely on the activities you already record in Strava, so there's no extra background load. Pro's 24/7 tracking uses efficient background location — you can tune accuracy in settings to balance battery and precision.</p></details>
+    <details><summary>Is my data private?</summary><p>Yes. AirTrack is GDPR-compliant, never shares your personal data without consent, and lets you disconnect or delete your account anytime. Air quality is the only thing written to your Strava feed.</p></details>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section>
+  <div class="wrap">
+    <div class="final">
+      <span class="eyebrow" style="color:#ff9d5c">See what you breathe. Choose where you move.</span>
+      <h2>Get your air on your next run.</h2>
+      <p>Join 4,500+ movers turning invisible exposure into a number they can act on. Free to start, unlimited for 99p, or go Pro for the full performance picture.</p>
+      <div class="store-badges">
+        <a href="https://lprdg.app.link/Xsh8RXXjVXb"><img src="assets/app-store-badge.svg" alt="Download on the App Store"></a>
+        <a href="https://lprdg.app.link/jUE66m1jVXb"><img src="assets/play-store-badge.png" alt="Get it on Google Play"></a>
+      </div>
+      <p class="reassure">No hardware · Set up in ~2 minutes · Cancel paid plans anytime</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="brand" style="color:#fff">
+        <!-- PLACEHOLDER: swap for the real AirTrack logo mark (light/white version for dark background) -->
+        <span class="logo-slot placeholder" style="width:26px;height:26px;border-radius:8px">
+          <span class="ph-label" style="font-size:.42rem">LOGO</span>
+        </span>
+        AirTrack <span style="color:#7f8ba0;font-weight:600;font-size:.85rem">by Air Aware Labs</span>
+      </div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <a href="https://www.airawarelabs.com/airtrack">AirTrack</a>
+        <a href="https://www.airawarelabs.com/knowledge">Knowledge</a>
+        <a href="https://www.airawarelabs.com/policies/terms">Terms</a>
+        <a href="https://www.airawarelabs.com/privacy">Privacy</a>
+      </div>
+    </div>
+    <p class="disclaim">Air quality figures referenced on this page are drawn from peer-reviewed research and are simplified, straight-line estimates intended to illustrate scale — not clinical predictions or medical advice. There is no known safe threshold for fine particulate matter. AirTrack is designed to inform and empower healthier choices, not to discourage outdoor activity. Company registered in England, no. 15435500.</p>
+  </div>
+</footer>
+
+</body>
+</html>
