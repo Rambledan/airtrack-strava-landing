@@ -96,33 +96,8 @@
   .trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--ink-soft);font-size:.9rem;font-weight:600}
   .trust b{color:var(--ink)}
 
-  /* Strava replica card */
-  .feed-card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lg);
-    overflow:hidden;max-width:400px;margin:0 auto;width:100%}
-  .fc-top{display:flex;align-items:center;gap:12px;padding:16px 18px 10px}
-  .fc-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff8f5e,#ff610a);
-    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.05rem}
-  .fc-name{font-weight:800;font-size:.98rem}
-  .fc-sub{font-size:.8rem;color:var(--ink-soft)}
-  .fc-title{padding:2px 18px 10px;font-weight:800;font-size:1.12rem}
-  .fc-stats{display:flex;gap:26px;padding:4px 18px 14px;border-bottom:1px solid var(--line)}
-  .fc-stat .k{font-size:.72rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
-  .fc-stat .v{font-size:1.24rem;font-weight:800}
-  .fc-map{height:120px;background:
-     linear-gradient(120deg,#eaf2ec,#e5eef7);position:relative;overflow:hidden}
-  .fc-map svg{position:absolute;inset:0;width:100%;height:100%}
-  .fc-aq{background:linear-gradient(180deg,#fff,#f6fbf8);padding:14px 18px;border-top:1px solid var(--line)}
-  .fc-aq .row1{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.86rem;color:var(--clean)}
-  .fc-aq .tag{margin-left:auto;background:var(--clean);color:#fff;font-size:.72rem;font-weight:800;
-    padding:3px 9px;border-radius:999px}
-  .fc-aq .line{font-size:.9rem;color:var(--ink-soft);margin-top:6px}
-  .fc-aq .line b{color:var(--ink)}
-  .fc-brand{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--ink-soft);
-    padding:10px 18px;border-top:1px solid var(--line)}
-  .fc-brand .chip{width:16px;height:16px;border-radius:5px;background:var(--orange)}
-  .pulse{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--strava);
-    box-shadow:0 0 0 rgba(252,76,2,.5);animation:pulse 2s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(252,76,2,.5)}70%{box-shadow:0 0 0 12px rgba(252,76,2,0)}100%{box-shadow:0 0 0 0 rgba(252,76,2,0)}}
+  /* Strava feed screenshot */
+  .feed-screenshot{max-width:280px;width:100%;margin:0 auto;border-radius:32px;box-shadow:var(--shadow-lg)}
 
   /* Sections */
   section{padding:66px 0}
@@ -266,34 +241,9 @@
       </div>
     </div>
 
-    <!-- Replica Strava card -->
+    <!-- Strava feed screenshot -->
     <div>
-      <div class="feed-card">
-        <div class="fc-top">
-          <div class="fc-av">JR</div>
-          <div>
-            <div class="fc-name">Jamie R.</div>
-            <div class="fc-sub">Morning Run · Today at 07:12</div>
-          </div>
-        </div>
-        <div class="fc-title">Parkrun 5K 🏃‍♀️</div>
-        <div class="fc-stats">
-          <div class="fc-stat"><div class="k">Distance</div><div class="v">5.02<span style="font-size:.8rem"> km</span></div></div>
-          <div class="fc-stat"><div class="k">Pace</div><div class="v">4:48<span style="font-size:.8rem"> /km</span></div></div>
-          <div class="fc-stat"><div class="k">Time</div><div class="v">24:06</div></div>
-        </div>
-        <div class="fc-map">
-          <svg viewBox="0 0 400 120" preserveAspectRatio="none">
-            <path d="M20,95 C70,40 120,120 170,70 S280,30 330,60 380,40 390,55" fill="none" stroke="#fc4c02" stroke-width="4" stroke-linecap="round"/>
-          </svg>
-          <div class="pulse" style="left:18px;top:88px"></div>
-        </div>
-        <div class="fc-aq">
-          <div class="row1">🌬️ Air quality on this route <span class="tag">CLEAN</span></div>
-          <div class="line">Avg exposure <b>PM2.5 6 µg/m³</b> · You picked a low-traffic route — nice one. <b>Exposure 22% below</b> your weekly average.</div>
-        </div>
-        <div class="fc-brand"><span class="chip"></span> Air quality by AirTrack · compatible with Strava</div>
-      </div>
+      <img class="feed-screenshot" src="assets/Stravafeedsceenshot.png" alt="AirTrack air quality shown inside a Strava activity feed">
     </div>
   </div>
 </section>
