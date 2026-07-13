@@ -18,7 +18,7 @@ All placeholders have been replaced with real assets:
 |---|---|
 | Header logo | `assets/airtrack-logo.svg` |
 | Footer logo | `assets/airtrack-logo.svg` (same orange mark, reads fine on the dark footer) |
-| Hero (Strava route mockup) | `assets/StraveMockUp.png` |
+| Hero (Strava route mockup) | `assets/StraveMockUpv2.png` |
 | "See it in the app" section | `assets/newdashboard.png` |
 | App Store / Google Play badges | `assets/app-store-badge.svg`, `assets/play-store-badge.png` |
 
